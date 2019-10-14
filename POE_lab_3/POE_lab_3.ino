@@ -16,7 +16,13 @@ Adafruit_DCMotor *myMotorright = AFMS.getMotor(4);
 int leftSensor = A0;
 int rightSensor = A1;
 
+// Setting up serial inputs:
+const byte numChars = 32;
+char input[numChars];
+boolean newData = false;
 
+int intInput = 0;
+char charInput[32] = {0};
 
 void setup() {
   AFMS.begin();
@@ -40,9 +46,13 @@ int e = 1;
 
 
 void loop() {
-
-
+  recInput();
+  parseInput();
+  updateInput();
+/*
   if (Serial.available() > 0) {
+    a = Serial.read();
+    Serial.println(a);
     if(Serial.read() == 'a'){
       a = Serial.parseInt();
       Serial.println(a);
@@ -53,7 +63,7 @@ void loop() {
       Serial.println(b);
     }
   }
-  
+  */
   if (leftSensor && rightSensor >= a) {
     b = b+d;
     c = c+e;
@@ -77,4 +87,48 @@ void loop() {
 
   
 
+}
+
+void recInput() {
+  static byte ndx = 0;
+  char endMarker = '\n';
+  char rc;
+  while (Serial.available() > 0 && newData == false) {
+    rc = Serial.read();
+
+    if (rc != endMarker) {
+      input[ndx] = rc;
+      ndx++;
+      if (ndx >= numChars) {
+        ndx = numChars - 1;
+      }
+    } else {
+      input[ndx] = '\0'; // end the string
+      ndx = 0;
+      newData = true;
+    }
+    
+  }
+}
+void parseInput(){
+  if (newData == true) {
+    char * strtokIndx;
+  
+    strtokIndx = strtok(input,"="); // Get the first part (the string)
+    strcpy(charInput, strtokIndx); //Copy it to charInput
+  
+    strtokIndx = strtok(NULL, "="); // Continue where the last left off
+    intInput = atoi(strtokIndx); // Convert to int
+  }
+  
+}
+
+void updateInput(){
+  if (newData == true) {
+    Serial.println("Received variable:");
+    Serial.println(charInput);
+    Serial.println("Received int:");
+    Serial.println(intInput);
+    newData = false;
+  }
 }
