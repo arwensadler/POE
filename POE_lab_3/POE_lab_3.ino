@@ -16,67 +16,55 @@ Adafruit_DCMotor *myMotorright = AFMS.getMotor(4);
 int leftSensor = A0;
 int rightSensor = A1;
 
-// Setting up serial inputs:
-const byte numChars = 32;
-char input[numChars];
-boolean newData = false;
-
-int intInput = 0;
-char charInput[32] = {0};
 
 void setup() {
   AFMS.begin();
 
   Serial.begin(9600);
-  Serial.println("a: IR sensor cutoff threshold");
-  Serial.println("b: left speed");
-  Serial.println("c: right speed");
-  Serial.println("d: left speed increment");
-  Serial.println("e: right speed increment");
+  Serial.println("<Arduino ready!>");
+
+  myMotorleft->run(FORWARD);
+  myMotorright->run(FORWARD);
   
 
 }
 
 
-int a = 985;
-int b = 20;
-int c = 20;
-int d = 1;
-int e = 1;
-int speed = 10;
+int a = 970; // Sensor value to indicate if on line or not
+int s = 10;
 
 
 void loop() {
   recInput();
 
   if (leftSensor && rightSensor >= a) {
-    b = b+d;
-    c = c+e;
-    myMotorleft->setSpeed(b);
-    myMotorright->setSpeed(c);
-    myMotorleft->run(FORWARD);
-    myMotorright->run(FORWARD);
+   // Straigt condition
+    myMotorleft->setSpeed(s);
+    myMotorright->setSpeed(s);
+    
   } else if (leftSensor >= a && rightSensor < a){
-    b = b-d;
-    myMotorleft->setSpeed(b);
-    myMotorright->setSpeed(c);
-    myMotorleft->run(FORWARD);
-    myMotorright->run(FORWARD);
+    // Left turn condition
+    myMotorleft->setSpeed(0);
+    myMotorright->setSpeed(s+10);
+ 
   } else if (leftSensor < a && rightSensor >= a){
-    c = c-e;
-    myMotorleft->setSpeed(b);
-    myMotorright->setSpeed(c);
-    myMotorleft->run(FORWARD);
-    myMotorright->run(FORWARD);
+    // Right turn condition
+    myMotorleft->setSpeed(s+10);
+    myMotorright->setSpeed(0);
+    
+  } else {
+    for(int i = 0; i <= 1; i++){
+    Serial.println("Please put me on the line!");
   }
 
   
 
 }
+}
 
 void recInput() {
    if (Serial.available() > 0) {    // is a character available?
-      speed = Serial.readString().toInt(); // read the number and set it to speed
-      Serial.println(speed);
+      s = Serial.readString().toInt(); // read the number and set it to speed
+      Serial.println(s);
     }
 }
