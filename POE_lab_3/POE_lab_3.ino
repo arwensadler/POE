@@ -16,19 +16,51 @@ Adafruit_DCMotor *myMotorright = AFMS.getMotor(4);
 int leftSensor = A0;
 int rightSensor = A1;
 
+
+
 void setup() {
   AFMS.begin();
 
   Serial.begin(9600);
-  Serial.print("a: left speed adjustment");
-  Serial.println("b: right speed adjustment");
+  Serial.println("a: IR sensor cutoff threshold");
+  Serial.println("b: left speed");
+  Serial.println("c: right speed");
+  Serial.println("d: left speed increment");
+  Serial.println("e: right speed increment");
+  
 
 }
 
+
+int a = 985;
+int b = 50;
+int c = 50;
+int d = 1;
+int e = 1;
+
+
 void loop() {
-  myMotorleft->setSpeed(50);
-  myMotorright->setSpeed(50);
-  myMotorleft->run(FORWARD);
-  myMotorright->run(FORWARD);
+
+
+  if (Serial.available() > 0) {
+    if(Serial.read() == 'a'){
+      a = Serial.parseInt();
+      Serial.println(a);
+    }
+    // TO DEBUG: The second if statement isn't running
+    else if(Serial.read() == 'b'){
+      b = Serial.parseInt();
+      Serial.println(b);
+    }
+  }
+  
+  if (leftSensor && rightSensor >= a) {
+    myMotorleft->setSpeed(b);
+    myMotorright->setSpeed(c);
+    myMotorleft->run(FORWARD);
+    myMotorright->run(FORWARD);
+  }
+
+  
 
 }
