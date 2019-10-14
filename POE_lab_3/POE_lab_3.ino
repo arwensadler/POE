@@ -33,8 +33,8 @@ void setup() {
 
 
 int a = 985;
-int b = 50;
-int c = 50;
+int b = 20;
+int c = 20;
 int d = 1;
 int e = 1;
 
@@ -55,6 +55,20 @@ void loop() {
   }
   
   if (leftSensor && rightSensor >= a) {
+    b = b+d;
+    c = c+e;
+    myMotorleft->setSpeed(b);
+    myMotorright->setSpeed(c);
+    myMotorleft->run(FORWARD);
+    myMotorright->run(FORWARD);
+  } else if (leftSensor >= a && rightSensor < a){
+    b = b-d;
+    myMotorleft->setSpeed(b);
+    myMotorright->setSpeed(c);
+    myMotorleft->run(FORWARD);
+    myMotorright->run(FORWARD);
+  } else if (leftSensor < a && rightSensor >= a){
+    c = c-e;
     myMotorleft->setSpeed(b);
     myMotorright->setSpeed(c);
     myMotorleft->run(FORWARD);
