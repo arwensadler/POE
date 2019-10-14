@@ -9,15 +9,18 @@
 
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 
-Adafruit_DCMotor *myMotorleft = AFMS.getMotor(3);
+Adafruit_DCMotor *myMotorleft = AFMS.getMotor(2);
 Adafruit_DCMotor *myMotorright = AFMS.getMotor(4);
 
-// Setting up the sensors:
-int leftSensor = A0;
-int rightSensor = A1;
+
 
 
 void setup() {
+
+  pinMode(A0, INPUT);
+  pinMode(A1, INPUT);
+
+  
   AFMS.begin();
 
   Serial.begin(9600);
@@ -30,37 +33,43 @@ void setup() {
 }
 
 
-int a = 970; // Sensor value to indicate if on line or not
-int s = 10;
+int a = 980; // Left sensor value to indicate if on line or not
+int b = 980; // Right ""
+int s = 0; // Speed of the motors
+
+
 
 
 void loop() {
+  
+  
+  // Setting up the sensors:
+  int leftSensor = analogRead(A0);
+  int rightSensor = analogRead(A1);
+
+  Serial.print(leftSensor); Serial.print(",");
+  Serial.println(rightSensor);
+  
+  
   recInput();
 
-  if (leftSensor && rightSensor >= a) {
-   // Straigt condition
+
+  if (leftSensor < a && rightSensor < b){
     myMotorleft->setSpeed(s);
     myMotorright->setSpeed(s);
     
-  } else if (leftSensor >= a && rightSensor < a){
-    // Left turn condition
-    myMotorleft->setSpeed(0);
-    myMotorright->setSpeed(s+10);
- 
-  } else if (leftSensor < a && rightSensor >= a){
-    // Right turn condition
-    myMotorleft->setSpeed(s+10);
+  } else if (rightSensor >= b) {
+    myMotorleft->setSpeed(s);
     myMotorright->setSpeed(0);
     
-  } else {
-    for(int i = 0; i <= 1; i++){
-    Serial.println("Please put me on the line!");
+  } else if (leftSensor >= a) {
+    myMotorleft->setSpeed(0);
+    myMotorright->setSpeed(s);
+    
   }
 
-  
+}
 
-}
-}
 
 void recInput() {
    if (Serial.available() > 0) {    // is a character available?
